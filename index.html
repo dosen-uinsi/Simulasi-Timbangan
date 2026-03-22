@@ -10,7 +10,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: 'Nunito', sans-serif; background: #1a1a2e; overscroll-behavior-y: none; }
+    html, body { height: 100%; font-family: 'Nunito', sans-serif; background: #0b1121; overscroll-behavior-y: none; }
+
+    /* Menyembunyikan scrollbar agar terlihat seperti aplikasi native */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     .scale-needle {
       transform-origin: 50% 90%;
@@ -65,20 +69,21 @@
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
 </head>
-<body class="h-full overflow-hidden">
-  <div id="app-wrapper" class="h-full w-full flex flex-col items-center overflow-y-auto" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+<body class="h-full w-full bg-[#0b1121] flex justify-center items-center overflow-hidden">
+  
+  <div id="app-wrapper" class="w-full h-full sm:w-[400px] sm:h-[850px] sm:max-h-[95vh] sm:rounded-[2.5rem] sm:border-[8px] sm:border-[#1e293b] flex flex-col items-center overflow-x-hidden overflow-y-auto shadow-2xl relative no-scrollbar" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
     
-    <div class="w-full max-w-2xl px-4 pt-5 pb-1 shrink-0">
+    <div class="w-full px-4 pt-6 pb-2 shrink-0">
       <h1 class="text-center tracking-tight leading-tight flex flex-col items-center">
-        <span id="el-title" class="font-black text-2xl text-[#f8fafc]">Latihan Membaca Timbangan</span>
-        <span class="text-xs font-extrabold mt-1 tracking-widest uppercase px-2 py-0.5 rounded" style="color:#ea580c; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.2);">
+        <span id="el-title" class="font-black text-[22px] text-[#f8fafc]">Latihan Membaca Timbangan</span>
+        <span class="text-[10px] font-extrabold mt-1 tracking-widest uppercase px-2 py-0.5 rounded" style="color:#ea580c; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.2);">
           By Mathnology
         </span>
       </h1>
       <p id="el-instruction" class="text-center mt-2 font-semibold text-sm transition-colors duration-300" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
     </div>
 
-    <div class="w-full max-w-2xl px-4 flex flex-col gap-2 mt-2 shrink-0">
+    <div class="w-full px-4 flex flex-col gap-2 mt-1 shrink-0">
       <div class="flex items-center justify-between">
         
         <div class="flex items-center gap-2">
@@ -108,7 +113,7 @@
 
       <div class="flex gap-2 justify-center mt-1">
         <button id="btn-trap" onclick="toggleTrapMode()" class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#16213e;color:#94a3b8;border:1px dashed #334155;">
-          <i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan Satuan
+          <i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan
         </button>
         <button id="btn-blind" onclick="toggleBlindMode()" class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#16213e;color:#94a3b8;border:1px dashed #334155;">
           <i data-lucide="eye-off" style="width:14px;height:14px;"></i> Skala Buta
@@ -116,8 +121,8 @@
       </div>
     </div>
 
-    <div class="w-full max-w-2xl px-4 flex-1 flex flex-col items-center justify-center min-h-[200px]">
-      <div class="relative w-full max-w-[300px] sm:max-w-[360px] mt-2">
+    <div class="w-full px-4 flex-1 flex flex-col items-center justify-center min-h-[200px]">
+      <div class="relative w-full max-w-[300px] sm:max-w-[340px] mt-2">
         <svg id="scale-svg" viewBox="0 0 400 280" class="w-full h-auto drop-shadow-2xl">
           <defs>
             <radialGradient id="faceGrad" cx="50%" cy="40%" r="55%">
@@ -167,26 +172,26 @@
           0 – 5 kg
         </div>
 
-        <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]"></div>
       </div>
     </div>
 
-    <div class="w-full max-w-sm px-4 pb-2 shrink-0">
+    <div class="w-full px-4 pb-2 shrink-0">
       <div class="flex flex-col gap-2">
         <div>
           <label id="input-label" for="answer-input" class="block text-sm font-bold mb-1 transition-colors duration-300" style="color:#94a3b8;">Jawaban (kg)</label> 
-          <input id="answer-input" type="number" step="any" min="0" inputmode="decimal" placeholder="ketik angka..." class="w-full px-4 py-3 sm:py-4 rounded-xl text-xl sm:text-2xl font-bold text-center outline-none transition-all duration-200" style="background:#16213e;color:#f8fafc;border:2px solid #1e3a5f;font-family:'JetBrains Mono',monospace;" onfocus="this.style.borderColor='#ea580c'" onblur="this.style.borderColor='#1e3a5f'" onkeydown="if(event.key==='Enter')checkAnswer()">
+          <input id="answer-input" type="number" step="any" min="0" inputmode="decimal" placeholder="ketik angka..." class="w-full px-4 py-3 sm:py-3.5 rounded-xl text-xl font-bold text-center outline-none transition-all duration-200" style="background:#16213e;color:#f8fafc;border:2px solid #1e3a5f;font-family:'JetBrains Mono',monospace;" onfocus="this.style.borderColor='#ea580c'" onblur="this.style.borderColor='#1e3a5f'" onkeydown="if(event.key==='Enter')checkAnswer()">
         </div>
         
-        <button id="btn-check" onclick="checkAnswer()" class="w-full px-5 py-3.5 sm:py-4 rounded-xl font-bold text-base transition-all duration-200 pulse-glow" style="background:#ea580c;color:#fff;border:none;cursor:pointer;"> Periksa Jawaban </button>
+        <button id="btn-check" onclick="checkAnswer()" class="w-full px-5 py-3.5 rounded-xl font-bold text-base transition-all duration-200 pulse-glow" style="background:#ea580c;color:#fff;border:none;cursor:pointer;"> Periksa Jawaban </button>
       </div>
 
-      <div id="feedback" class="mt-2 text-center font-bold text-sm sm:text-base rounded-xl px-4 py-3 transition-all duration-300 empty:hidden" style="min-height: 48px;"></div>
+      <div id="feedback" class="mt-2 text-center font-bold text-sm sm:text-[15px] rounded-xl px-4 py-3 transition-all duration-300 empty:hidden" style="min-height: 48px;"></div>
       
-      <button id="btn-next" onclick="newQuestion()" class="w-full mt-2 mb-2 px-5 py-3.5 sm:py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-lg" style="background:#1e3a5f;color:#e2e8f0;border:2px solid #2d4a6f;cursor:pointer;display:none;" onmouseover="this.style.background='#2d4a6f'" onmouseout="this.style.background='#1e3a5f'"> Lanjut Soal Baru </button>
+      <button id="btn-next" onclick="newQuestion()" class="w-full mt-2 mb-2 px-5 py-3.5 rounded-xl font-bold text-base transition-all duration-200 shadow-lg" style="background:#1e3a5f;color:#e2e8f0;border:2px solid #2d4a6f;cursor:pointer;display:none;" onmouseover="this.style.background='#2d4a6f'" onmouseout="this.style.background='#1e3a5f'"> Lanjut Soal Baru </button>
     </div>
 
-    <div id="streak-bar" class="w-full max-w-2xl px-4 pb-4 min-h-[40px]">
+    <div id="streak-bar" class="w-full px-4 pb-6 min-h-[40px] shrink-0">
       <div class="flex items-center justify-center gap-1 flex-wrap" id="streak-icons"></div>
     </div>
   </div>
@@ -327,7 +332,7 @@
       btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: ON`;
     } else {
       btn.classList.remove('toggle-active');
-      btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: OFF`;
+      btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan`;
     }
     lucide.createIcons();
     newQuestion(); 
@@ -341,7 +346,7 @@
       btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: ON`;
     } else {
       btn.classList.remove('toggle-active');
-      btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: OFF`;
+      btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Skala Buta`;
     }
     lucide.createIcons();
     drawScale(); 
