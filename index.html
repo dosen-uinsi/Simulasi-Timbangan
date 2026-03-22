@@ -39,6 +39,12 @@
       80% { transform: translateX(4px); }
     }
 
+    .spin-once { animation: spinOnce 0.5s ease-out; }
+    @keyframes spinOnce {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .confetti-piece {
       position: absolute;
       width: 8px; height: 8px; border-radius: 2px;
@@ -69,9 +75,15 @@
 
     <div class="w-full max-w-2xl px-4 flex flex-col gap-2 mt-2 shrink-0">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1.5 bg-black/20 px-3 py-1.5 rounded-xl">
-          <span style="color: #fbbf24;"><i data-lucide="trophy" style="width:16px;height:16px;"></i></span> 
-          <span id="el-score" class="font-bold text-sm" style="color: #fbbf24;">Skor: 0/0</span>
+        
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5 bg-black/20 px-3 py-1.5 rounded-xl">
+            <span style="color: #fbbf24;"><i data-lucide="trophy" style="width:16px;height:16px;"></i></span> 
+            <span id="el-score" class="font-bold text-sm" style="color: #fbbf24;">Skor: 0/0</span>
+          </div>
+          <button id="btn-reset" onclick="resetGame()" class="p-1.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/30 transition-all duration-200 border border-[#ef4444]/20" title="Reset Skor">
+            <i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>
+          </button>
         </div>
         
         <div class="flex bg-[#0f3460] rounded-lg p-1 border border-[#1e3a5f]">
@@ -176,8 +188,8 @@
 
   <script>
   // ---- State Varian & Tantangan ----
-  let currentUnit = 'kg'; // Unit di visual timbangan
-  let askUnit = 'kg';     // Unit yang diminta di jawaban
+  let currentUnit = 'kg'; 
+  let askUnit = 'kg';     
   let difficulty = 'medium'; 
   
   let isTrapMode = false;
@@ -200,21 +212,21 @@
   let currentWeight = 0;
   let score = 0;
   let total = 0;
-  let streak = 0;
+  let streakHistory = []; 
   let maxStreak = 0;
   let answered = false;
 
-  // ---- Helper Fungsi Menentukan Warna Api berdasarkan Difficulty ----
-  function getFireStyle() {
-    if (difficulty === 'easy') {
+  // ---- Helper Fungsi Menentukan Warna Api ----
+  function getFireStyle(diff) {
+    if (diff === 'easy') {
       return { filter: 'hue-rotate(100deg)', textColor: '#4ade80' }; // Hijau
-    } else if (difficulty === 'hard') {
+    } else if (diff === 'hard') {
       return { filter: 'hue-rotate(220deg)', textColor: '#60a5fa' }; // Biru
     }
     return { filter: 'hue-rotate(0deg)', textColor: '#fbbf24' }; // Oranye (Sedang)
   }
 
-  // ---- Menggambar Garis Timbangan ----
+  // ---- Fungsi Menggambar SVG ----
   function drawScale() {
     const d = scaleData[currentUnit][difficulty];
     const markingsEl = document.getElementById('scale-markings');
@@ -330,6 +342,30 @@
     drawScale(); 
   }
 
+  // ---- Reset Logic ----
+  function resetGame() {
+    // Menambahkan animasi putar pada tombol reset
+    const btnReset = document.getElementById('btn-reset');
+    btnReset.classList.remove('spin-once');
+    void btnReset.offsetWidth; // trigger reflow
+    btnReset.classList.add('spin-once');
+
+    // Reset state
+    score = 0;
+    total = 0;
+    streakHistory = [];
+    maxStreak = 0;
+    
+    // Perbarui UI Text
+    document.getElementById('el-score').textContent = `Skor: 0/0`;
+    
+    // Perbarui deretan api (menghapusnya)
+    updateStreak();
+
+    // Buat soal baru
+    newQuestion();
+  }
+
   // ---- Logic Soal Baru ----
   function newQuestion() {
     answered = false;
@@ -401,21 +437,21 @@
 
     const correct = Math.abs(val - expectedVal) <= (expectedTolerance + 0.0001);
     const displayAskUnit = askUnit === 'kg' ? 'kg' : 'g';
-    const fireStyle = getFireStyle();
+    const fireStyle = getFireStyle(difficulty);
 
     if (correct) {
       score++;
-      streak++;
-      if (streak > maxStreak) maxStreak = streak;
+      streakHistory.push(difficulty);
+      if (streakHistory.length > maxStreak) maxStreak = streakHistory.length;
       
       const fireEmojiStr = `<span style="display:inline-block; filter:${fireStyle.filter};">🔥</span>`;
       fb.innerHTML = `🎉 Benar! Jawabannya <strong>${expectedVal} ${displayAskUnit}</strong>` + 
-                     (streak >= 3 ? `<br>${fireEmojiStr} ${streak}x berturut-turut!` : '');
+                     (streakHistory.length >= 3 ? `<br>${fireEmojiStr} ${streakHistory.length}x berturut-turut!` : '');
       fb.style.background = 'rgba(34,197,94,0.15)';
       fb.style.color = '#4ade80';
       spawnConfetti();
     } else {
-      streak = 0;
+      streakHistory = [];
       fb.innerHTML = `❌ Kurang tepat. Jawabanmu <strong>${val} ${displayAskUnit}</strong>,<br>yang benar <strong>${expectedVal} ${displayAskUnit}</strong>`;
       fb.style.background = 'rgba(239,68,68,0.15)';
       fb.style.color = '#f87171';
@@ -427,10 +463,10 @@
     input.disabled = true;
     document.getElementById('btn-check').style.display = 'none';
     document.getElementById('btn-next').style.display = 'block';
+    
     updateStreak();
   }
 
-  // ---- Pengaturan Dasar ----
   function setUnit(u) {
     currentUnit = u;
     const btnKg = document.getElementById('btn-unit-kg');
@@ -465,9 +501,6 @@
       }
     });
     
-    // Perbarui warna api di streak yang sudah ada jika pengguna mengubah tingkat kesulitan di tengah jalan
-    updateStreak();
-    
     drawScale();
     newQuestion();
   }
@@ -476,28 +509,33 @@
   function updateStreak() {
     const container = document.getElementById('streak-icons');
     container.innerHTML = '';
-    const show = Math.min(streak, 10);
+    const show = Math.min(streakHistory.length, 10); 
     const frag = document.createDocumentFragment();
     
-    const fireStyle = getFireStyle();
-
     for (let i = 0; i < show; i++) {
+      const pastDifficulty = streakHistory[i]; 
+      const fireStyle = getFireStyle(pastDifficulty);
+
       const span = document.createElement('span');
       span.textContent = '🔥';
       span.style.fontSize = '18px';
       span.className = 'bounce-in';
-      span.style.display = 'inline-block'; // Diperlukan agar filter CSS berfungsi baik
-      span.style.filter = fireStyle.filter;
+      span.style.display = 'inline-block'; 
+      span.style.filter = fireStyle.filter; 
       span.style.animationDelay = `${i * 60}ms`;
       frag.appendChild(span);
     }
     
-    if (streak > 10) {
+    if (streakHistory.length > 10) {
+      const latestDifficulty = streakHistory[streakHistory.length - 1];
+      const latestStyle = getFireStyle(latestDifficulty);
+      
       const span = document.createElement('span');
-      span.textContent = `+${streak - 10}`;
-      span.style.cssText = `font-size:14px;font-weight:800;color:${fireStyle.textColor};margin-left:4px;`;
+      span.textContent = `+${streakHistory.length - 10}`;
+      span.style.cssText = `font-size:14px;font-weight:800;color:${latestStyle.textColor};margin-left:4px;`;
       frag.appendChild(span);
     }
+    
     container.appendChild(frag);
   }
 
