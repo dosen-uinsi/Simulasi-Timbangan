@@ -10,11 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: 'Nunito', sans-serif; background: #0b1121; overscroll-behavior-y: none; }
-
-    /* Menyembunyikan scrollbar agar terlihat seperti aplikasi native */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    html, body { height: 100%; font-family: 'Nunito', sans-serif; background: #1a1a2e; overscroll-behavior-y: none; }
 
     .scale-needle {
       transform-origin: 50% 90%;
@@ -69,130 +65,137 @@
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
 </head>
-<body class="h-full w-full bg-[#0b1121] flex justify-center items-center overflow-hidden">
+<body class="h-full overflow-hidden">
   
-  <div id="app-wrapper" class="w-full h-full sm:w-[400px] sm:h-[850px] sm:max-h-[95vh] sm:rounded-[2.5rem] sm:border-[8px] sm:border-[#1e293b] flex flex-col items-center overflow-x-hidden overflow-y-auto shadow-2xl relative no-scrollbar" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+  <div id="confetti-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+  <div id="app-wrapper" class="h-full w-full flex flex-col items-center overflow-y-auto" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
     
-    <div class="w-full px-4 pt-6 pb-2 shrink-0">
+    <div class="w-full max-w-5xl px-4 pt-6 pb-2 shrink-0">
       <h1 class="text-center tracking-tight leading-tight flex flex-col items-center">
-        <span id="el-title" class="font-black text-[22px] text-[#f8fafc]">Latihan Membaca Timbangan</span>
-        <span class="text-[10px] font-extrabold mt-1 tracking-widest uppercase px-2 py-0.5 rounded" style="color:#ea580c; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.2);">
+        <span id="el-title" class="font-black text-2xl md:text-3xl text-[#f8fafc]">Latihan Membaca Timbangan</span>
+        <span class="text-xs font-extrabold mt-1 tracking-widest uppercase px-2 py-0.5 rounded" style="color:#ea580c; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.2);">
           By Mathnology
         </span>
       </h1>
-      <p id="el-instruction" class="text-center mt-2 font-semibold text-sm transition-colors duration-300" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
+      <p id="el-instruction" class="text-center mt-3 font-semibold text-sm md:text-base transition-colors duration-300" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
     </div>
 
-    <div class="w-full px-4 flex flex-col gap-2 mt-1 shrink-0">
-      <div class="flex items-center justify-between">
+    <div class="w-full max-w-5xl px-4 mt-2 pb-8 flex flex-col lg:flex-row gap-6 lg:gap-8 items-center lg:items-stretch justify-center shrink-0">
+      
+      <div class="w-full max-w-md lg:max-w-lg flex-1 flex flex-col items-center justify-center bg-[#16213e] p-6 rounded-[2rem] border border-[#1e3a5f] shadow-2xl relative">
         
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1.5 bg-black/20 px-3 py-1.5 rounded-xl">
-            <span style="color: #fbbf24;"><i data-lucide="trophy" style="width:16px;height:16px;"></i></span> 
+        <div class="relative w-full max-w-[320px] sm:max-w-[400px]">
+          <svg id="scale-svg" viewBox="0 0 400 280" class="w-full h-auto drop-shadow-2xl">
+            <defs>
+              <radialGradient id="faceGrad" cx="50%" cy="40%" r="55%">
+                <stop offset="0%" stop-color="#f8fafc" />
+                <stop offset="80%" stop-color="#e2e8f0" />
+                <stop offset="100%" stop-color="#cbd5e1" />
+              </radialGradient>
+              <radialGradient id="rimGrad" cx="50%" cy="30%">
+                <stop offset="0%" stop-color="#64748b" />
+                <stop offset="100%" stop-color="#334155" />
+              </radialGradient>
+              <filter id="innerShadow">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur" />
+                <feOffset dx="0" dy="2" />
+                <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" />
+                <feFlood flood-color="#000" flood-opacity="0.15" />
+                <feComposite in2="SourceAlpha" operator="in" />
+                <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+            </defs> 
+            
+            <circle cx="200" cy="160" r="138" fill="url(#rimGrad)" stroke="#1e293b" stroke-width="2" /> 
+            <circle cx="200" cy="160" r="128" fill="url(#faceGrad)" filter="url(#innerShadow)" /> 
+            
+            <g id="scale-markings"></g> 
+            <g id="scale-numbers" style="font-family:'JetBrains Mono',monospace;"></g> 
+            
+            <text id="unit-label" x="200" y="210" text-anchor="middle" font-size="14" fill="#64748b" font-weight="800" style="font-family:'Nunito',sans-serif;">kg</text> 
+            <text id="diff-label" x="200" y="226" text-anchor="middle" font-size="9" fill="#94a3b8" font-weight="600" style="font-family:'Nunito',sans-serif;"></text> 
+            
+            <g id="needle-group" class="scale-needle" transform="rotate(-135, 200, 160)">
+              <line x1="200" y1="165" x2="200" y2="52" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" />
+              <polygon points="197,60 200,45 203,60" fill="#dc2626" />
+            </g> 
+            
+            <circle cx="200" cy="160" r="10" fill="#374151" /> 
+            <circle cx="200" cy="160" r="6" fill="#6b7280" /> 
+            <circle cx="200" cy="160" r="3" fill="#9ca3af" /> 
+            
+            <ellipse cx="175" cy="120" rx="50" ry="25" fill="rgba(255,255,255,0.12)" transform="rotate(-15, 175, 120)" /> 
+            
+            <rect x="130" y="272" width="140" height="8" rx="4" fill="#334155" /> 
+            <path d="M165 268 Q200 280 235 268 L240 272 Q200 284 160 272 Z" fill="#475569" />
+          </svg>
+
+          <div id="range-badge" class="absolute top-0 right-0 px-2.5 py-1 rounded-lg text-xs font-bold" style="background:rgba(15,52,96,0.9);color:#94a3b8;backdrop-filter:blur(4px);">
+            0 – 5 kg
+          </div>
+        </div>
+
+        <div id="streak-bar" class="w-full mt-6 min-h-[40px]">
+          <div class="flex items-center justify-center gap-1 flex-wrap" id="streak-icons"></div>
+        </div>
+
+      </div>
+
+      <div class="w-full max-w-sm shrink-0 flex flex-col gap-4">
+        
+        <div class="flex items-center justify-between bg-[#16213e] p-4 rounded-2xl border border-[#1e3a5f] shadow-lg">
+          <div class="flex items-center gap-2 bg-[#0f3460] px-3 py-2 rounded-xl border border-[#1e3a5f]">
+            <span style="color: #fbbf24;"><i data-lucide="trophy" style="width:18px;height:18px;"></i></span> 
             <span id="el-score" class="font-bold text-sm" style="color: #fbbf24;">Skor: 0/0</span>
           </div>
-          <button id="btn-reset" onclick="resetGame()" class="p-1.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/30 transition-all duration-200 border border-[#ef4444]/20" title="Reset Skor">
-            <i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>
+          <button id="btn-reset" onclick="resetGame()" class="p-2 rounded-xl bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/30 transition-all duration-200 border border-[#ef4444]/20" title="Reset Skor">
+            <i data-lucide="rotate-ccw" style="width:18px;height:18px;"></i>
           </button>
         </div>
-        
-        <div class="flex bg-[#0f3460] rounded-lg p-1 border border-[#1e3a5f]">
-          <button id="btn-unit-kg" onclick="setUnit('kg')" class="px-3 py-1 rounded-md text-xs font-bold transition-all duration-200" style="background:#ea580c;color:#fff;">Kg</button>
-          <button id="btn-unit-g" onclick="setUnit('g')" class="px-3 py-1 rounded-md text-xs font-bold transition-all duration-200" style="background:transparent;color:#94a3b8;">Gram</button>
-        </div>
-      </div>
 
-      <div class="flex gap-1 justify-between items-center w-full">
-        <span class="text-xs font-bold text-[#64748b]">Level:</span>
-        <div class="flex gap-1">
-          <button id="btn-easy" onclick="setDifficulty('easy')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Mudah</button> 
-          <button id="btn-medium" onclick="setDifficulty('medium')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#ea580c;color:#fff;border:1px solid #ea580c;">Sedang</button> 
-          <button id="btn-hard" onclick="setDifficulty('hard')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Sulit</button>
-        </div>
-      </div>
+        <div class="bg-[#16213e] p-4 rounded-2xl border border-[#1e3a5f] shadow-lg flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-[#64748b]">Timbangan:</span>
+            <div class="flex bg-[#0f3460] rounded-lg p-1 border border-[#1e3a5f]">
+              <button id="btn-unit-kg" onclick="setUnit('kg')" class="px-4 py-1.5 rounded-md text-xs font-bold transition-all duration-200" style="background:#ea580c;color:#fff;">Kg</button>
+              <button id="btn-unit-g" onclick="setUnit('g')" class="px-4 py-1.5 rounded-md text-xs font-bold transition-all duration-200" style="background:transparent;color:#94a3b8;">Gram</button>
+            </div>
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <span class="text-sm font-bold text-[#64748b]">Tingkat Kesulitan:</span>
+            <div class="flex gap-1 w-full">
+              <button id="btn-easy" onclick="setDifficulty('easy')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Mudah</button> 
+              <button id="btn-medium" onclick="setDifficulty('medium')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-200" style="background:#ea580c;color:#fff;border:1px solid #ea580c;">Sedang</button> 
+              <button id="btn-hard" onclick="setDifficulty('hard')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Sulit</button>
+            </div>
+          </div>
 
-      <div class="flex gap-2 justify-center mt-1">
-        <button id="btn-trap" onclick="toggleTrapMode()" class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#16213e;color:#94a3b8;border:1px dashed #334155;">
-          <i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan
-        </button>
-        <button id="btn-blind" onclick="toggleBlindMode()" class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#16213e;color:#94a3b8;border:1px dashed #334155;">
-          <i data-lucide="eye-off" style="width:14px;height:14px;"></i> Skala Buta
-        </button>
-      </div>
-    </div>
-
-    <div class="w-full px-4 flex-1 flex flex-col items-center justify-center min-h-[200px]">
-      <div class="relative w-full max-w-[300px] sm:max-w-[340px] mt-2">
-        <svg id="scale-svg" viewBox="0 0 400 280" class="w-full h-auto drop-shadow-2xl">
-          <defs>
-            <radialGradient id="faceGrad" cx="50%" cy="40%" r="55%">
-              <stop offset="0%" stop-color="#f8fafc" />
-              <stop offset="80%" stop-color="#e2e8f0" />
-              <stop offset="100%" stop-color="#cbd5e1" />
-            </radialGradient>
-            <radialGradient id="rimGrad" cx="50%" cy="30%">
-              <stop offset="0%" stop-color="#64748b" />
-              <stop offset="100%" stop-color="#334155" />
-            </radialGradient>
-            <filter id="innerShadow">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur" />
-              <feOffset dx="0" dy="2" />
-              <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" />
-              <feFlood flood-color="#000" flood-opacity="0.15" />
-              <feComposite in2="SourceAlpha" operator="in" />
-              <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs> 
-          
-          <circle cx="200" cy="160" r="138" fill="url(#rimGrad)" stroke="#1e293b" stroke-width="2" /> 
-          <circle cx="200" cy="160" r="128" fill="url(#faceGrad)" filter="url(#innerShadow)" /> 
-          
-          <g id="scale-markings"></g> 
-          <g id="scale-numbers" style="font-family:'JetBrains Mono',monospace;"></g> 
-          
-          <text id="unit-label" x="200" y="210" text-anchor="middle" font-size="14" fill="#64748b" font-weight="800" style="font-family:'Nunito',sans-serif;">kg</text> 
-          <text id="diff-label" x="200" y="226" text-anchor="middle" font-size="9" fill="#94a3b8" font-weight="600" style="font-family:'Nunito',sans-serif;"></text> 
-          
-          <g id="needle-group" class="scale-needle" transform="rotate(-135, 200, 160)">
-            <line x1="200" y1="165" x2="200" y2="52" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" />
-            <polygon points="197,60 200,45 203,60" fill="#dc2626" />
-          </g> 
-          
-          <circle cx="200" cy="160" r="10" fill="#374151" /> 
-          <circle cx="200" cy="160" r="6" fill="#6b7280" /> 
-          <circle cx="200" cy="160" r="3" fill="#9ca3af" /> 
-          
-          <ellipse cx="175" cy="120" rx="50" ry="25" fill="rgba(255,255,255,0.12)" transform="rotate(-15, 175, 120)" /> 
-          
-          <rect x="130" y="272" width="140" height="8" rx="4" fill="#334155" /> 
-          <path d="M165 268 Q200 280 235 268 L240 272 Q200 284 160 272 Z" fill="#475569" />
-        </svg>
-
-        <div id="range-badge" class="absolute top-0 right-0 px-2.5 py-1 rounded-lg text-xs font-bold" style="background:rgba(15,52,96,0.9);color:#94a3b8;backdrop-filter:blur(4px);">
-          0 – 5 kg
+          <div class="flex gap-2 justify-center pt-1 border-t border-[#1e3a5f]/50">
+            <button id="btn-trap" onclick="toggleTrapMode()" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#0f3460;color:#94a3b8;border:1px dashed #334155;">
+              <i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan Satuan
+            </button>
+            <button id="btn-blind" onclick="toggleBlindMode()" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#0f3460;color:#94a3b8;border:1px dashed #334155;">
+              <i data-lucide="eye-off" style="width:14px;height:14px;"></i> Skala Buta
+            </button>
+          </div>
         </div>
 
-        <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]"></div>
-      </div>
-    </div>
-
-    <div class="w-full px-4 pb-2 shrink-0">
-      <div class="flex flex-col gap-2">
-        <div>
-          <label id="input-label" for="answer-input" class="block text-sm font-bold mb-1 transition-colors duration-300" style="color:#94a3b8;">Jawaban (kg)</label> 
-          <input id="answer-input" type="number" step="any" min="0" inputmode="decimal" placeholder="ketik angka..." class="w-full px-4 py-3 sm:py-3.5 rounded-xl text-xl font-bold text-center outline-none transition-all duration-200" style="background:#16213e;color:#f8fafc;border:2px solid #1e3a5f;font-family:'JetBrains Mono',monospace;" onfocus="this.style.borderColor='#ea580c'" onblur="this.style.borderColor='#1e3a5f'" onkeydown="if(event.key==='Enter')checkAnswer()">
+        <div class="bg-[#16213e] p-4 rounded-2xl border border-[#1e3a5f] shadow-lg flex flex-col gap-3 mt-auto">
+          <div>
+            <label id="input-label" for="answer-input" class="block text-sm font-bold mb-1.5 transition-colors duration-300" style="color:#94a3b8;">Jawaban (kg)</label> 
+            <input id="answer-input" type="number" step="any" min="0" inputmode="decimal" placeholder="ketik angka..." class="w-full px-4 py-4 rounded-xl text-2xl font-bold text-center outline-none transition-all duration-200" style="background:#0f3460;color:#f8fafc;border:2px solid #1e3a5f;font-family:'JetBrains Mono',monospace;" onfocus="this.style.borderColor='#ea580c'" onblur="this.style.borderColor='#1e3a5f'" onkeydown="if(event.key==='Enter')checkAnswer()">
+          </div>
+          
+          <button id="btn-check" onclick="checkAnswer()" class="w-full px-5 py-4 rounded-xl font-bold text-base transition-all duration-200 pulse-glow" style="background:#ea580c;color:#fff;border:none;cursor:pointer;"> Periksa Jawaban </button>
+          
+          <button id="btn-next" onclick="newQuestion()" class="w-full px-5 py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-lg" style="background:#2d4a6f;color:#e2e8f0;border:2px solid #3b608c;cursor:pointer;display:none;" onmouseover="this.style.background='#3b608c'" onmouseout="this.style.background='#2d4a6f'"> Lanjut Soal Baru </button>
+          
+          <div id="feedback" class="text-center font-bold text-sm sm:text-base rounded-xl px-4 py-3 transition-all duration-300 empty:hidden" style="min-height: 48px;"></div>
         </div>
-        
-        <button id="btn-check" onclick="checkAnswer()" class="w-full px-5 py-3.5 rounded-xl font-bold text-base transition-all duration-200 pulse-glow" style="background:#ea580c;color:#fff;border:none;cursor:pointer;"> Periksa Jawaban </button>
+
       </div>
-
-      <div id="feedback" class="mt-2 text-center font-bold text-sm sm:text-[15px] rounded-xl px-4 py-3 transition-all duration-300 empty:hidden" style="min-height: 48px;"></div>
-      
-      <button id="btn-next" onclick="newQuestion()" class="w-full mt-2 mb-2 px-5 py-3.5 rounded-xl font-bold text-base transition-all duration-200 shadow-lg" style="background:#1e3a5f;color:#e2e8f0;border:2px solid #2d4a6f;cursor:pointer;display:none;" onmouseover="this.style.background='#2d4a6f'" onmouseout="this.style.background='#1e3a5f'"> Lanjut Soal Baru </button>
-    </div>
-
-    <div id="streak-bar" class="w-full px-4 pb-6 min-h-[40px] shrink-0">
-      <div class="flex items-center justify-center gap-1 flex-wrap" id="streak-icons"></div>
     </div>
   </div>
 
@@ -226,17 +229,15 @@
   let maxStreak = 0;
   let answered = false;
 
-  // ---- Helper Fungsi Menentukan Warna Api ----
   function getFireStyle(diff) {
     if (diff === 'easy') {
       return { filter: 'hue-rotate(100deg)', textColor: '#4ade80' }; // Hijau
     } else if (diff === 'hard') {
       return { filter: 'hue-rotate(220deg)', textColor: '#60a5fa' }; // Biru
     }
-    return { filter: 'hue-rotate(0deg)', textColor: '#fbbf24' }; // Oranye (Sedang)
+    return { filter: 'hue-rotate(0deg)', textColor: '#fbbf24' }; // Oranye
   }
 
-  // ---- Fungsi Menggambar SVG ----
   function drawScale() {
     const d = scaleData[currentUnit][difficulty];
     const markingsEl = document.getElementById('scale-markings');
@@ -323,7 +324,6 @@
     return parseFloat((randomStep * d.step).toFixed(2));
   }
 
-  // ---- Mode Tantangan Toggles ----
   function toggleTrapMode() {
     isTrapMode = !isTrapMode;
     const btn = document.getElementById('btn-trap');
@@ -332,7 +332,7 @@
       btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: ON`;
     } else {
       btn.classList.remove('toggle-active');
-      btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan`;
+      btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: OFF`;
     }
     lucide.createIcons();
     newQuestion(); 
@@ -346,13 +346,12 @@
       btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: ON`;
     } else {
       btn.classList.remove('toggle-active');
-      btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Skala Buta`;
+      btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: OFF`;
     }
     lucide.createIcons();
     drawScale(); 
   }
 
-  // ---- Reset Logic ----
   function resetGame() {
     const btnReset = document.getElementById('btn-reset');
     btnReset.classList.remove('spin-once');
@@ -369,7 +368,6 @@
     newQuestion();
   }
 
-  // ---- Logic Soal Baru ----
   function newQuestion() {
     answered = false;
     currentWeight = generateWeight();
@@ -403,7 +401,6 @@
     document.getElementById('btn-check').style.display = 'block';
   }
 
-  // ---- Logic Jawaban ----
   function checkAnswer() {
     if (answered) return;
     const input = document.getElementById('answer-input');
@@ -521,7 +518,7 @@
 
       const span = document.createElement('span');
       span.textContent = '🔥';
-      span.style.fontSize = '18px';
+      span.style.fontSize = '20px';
       span.className = 'bounce-in';
       span.style.display = 'inline-block'; 
       span.style.filter = fireStyle.filter; 
@@ -535,7 +532,7 @@
       
       const span = document.createElement('span');
       span.textContent = `+${streakHistory.length - 10}`;
-      span.style.cssText = `font-size:14px;font-weight:800;color:${latestStyle.textColor};margin-left:4px;`;
+      span.style.cssText = `font-size:16px;font-weight:900;color:${latestStyle.textColor};margin-left:4px;`;
       frag.appendChild(span);
     }
     
@@ -546,11 +543,14 @@
     const container = document.getElementById('confetti-container');
     const colors = ['#ea580c', '#fbbf24', '#4ade80', '#60a5fa', '#f472b6', '#a78bfa'];
     const frag = document.createDocumentFragment();
-    for (let i = 0; i < 20; i++) {
+    
+    // Perbanyak confetti karena areanya seluruh layar sekarang
+    for (let i = 0; i < 40; i++) {
       const piece = document.createElement('div');
       piece.className = 'confetti-piece';
-      piece.style.left = `${30 + Math.random() * 40}%`;
-      piece.style.top = `${20 + Math.random() * 20}%`;
+      piece.style.left = `${Math.random() * 100}%`;
+      // Buat confetti jatuh dari posisi acak di bagian atas layar
+      piece.style.top = `${Math.random() * 30}%`;
       piece.style.background = colors[Math.floor(Math.random() * colors.length)];
       piece.style.animationDelay = `${Math.random() * 0.4}s`;
       piece.style.transform = `rotate(${Math.random() * 360}deg)`;
