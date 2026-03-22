@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Latihan Membaca Timbangan</title>
+  <title>Latihan Membaca Timbangan by Mathnology</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
@@ -69,8 +69,13 @@
   <div id="app-wrapper" class="h-full w-full flex flex-col items-center overflow-y-auto" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
     
     <div class="w-full max-w-2xl px-4 pt-5 pb-1 shrink-0">
-      <h1 id="el-title" class="text-center font-black text-2xl tracking-tight leading-tight" style="color: #f8fafc;">Latihan Membaca Timbangan</h1>
-      <p id="el-instruction" class="text-center mt-1 font-semibold text-sm transition-colors duration-300" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
+      <h1 class="text-center tracking-tight leading-tight flex flex-col items-center">
+        <span id="el-title" class="font-black text-2xl text-[#f8fafc]">Latihan Membaca Timbangan</span>
+        <span class="text-xs font-extrabold mt-1 tracking-widest uppercase px-2 py-0.5 rounded" style="color:#ea580c; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.2);">
+          By Mathnology
+        </span>
+      </h1>
+      <p id="el-instruction" class="text-center mt-2 font-semibold text-sm transition-colors duration-300" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
     </div>
 
     <div class="w-full max-w-2xl px-4 flex flex-col gap-2 mt-2 shrink-0">
@@ -344,25 +349,18 @@
 
   // ---- Reset Logic ----
   function resetGame() {
-    // Menambahkan animasi putar pada tombol reset
     const btnReset = document.getElementById('btn-reset');
     btnReset.classList.remove('spin-once');
-    void btnReset.offsetWidth; // trigger reflow
+    void btnReset.offsetWidth; 
     btnReset.classList.add('spin-once');
 
-    // Reset state
     score = 0;
     total = 0;
     streakHistory = [];
     maxStreak = 0;
     
-    // Perbarui UI Text
     document.getElementById('el-score').textContent = `Skor: 0/0`;
-    
-    // Perbarui deretan api (menghapusnya)
     updateStreak();
-
-    // Buat soal baru
     newQuestion();
   }
 
