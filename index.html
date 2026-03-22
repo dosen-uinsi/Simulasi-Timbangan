@@ -204,6 +204,16 @@
   let maxStreak = 0;
   let answered = false;
 
+  // ---- Helper Fungsi Menentukan Warna Api berdasarkan Difficulty ----
+  function getFireStyle() {
+    if (difficulty === 'easy') {
+      return { filter: 'hue-rotate(100deg)', textColor: '#4ade80' }; // Hijau
+    } else if (difficulty === 'hard') {
+      return { filter: 'hue-rotate(220deg)', textColor: '#60a5fa' }; // Biru
+    }
+    return { filter: 'hue-rotate(0deg)', textColor: '#fbbf24' }; // Oranye (Sedang)
+  }
+
   // ---- Menggambar Garis Timbangan ----
   function drawScale() {
     const d = scaleData[currentUnit][difficulty];
@@ -249,7 +259,6 @@
       line.setAttribute('stroke-width', sw);
       markingsFrag.appendChild(line);
 
-      // Skala Buta: Sembunyikan angka, KECUALI angka 0 dan angka Maksimal
       const showNumber = !isBlindMode || (Math.round(value) === 0 || Math.round(value) === d.max);
 
       if (isMajor && showNumber) {
@@ -304,7 +313,7 @@
       btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: OFF`;
     }
     lucide.createIcons();
-    newQuestion(); // Render ulang soal
+    newQuestion(); 
   }
 
   function toggleBlindMode() {
@@ -318,7 +327,7 @@
       btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: OFF`;
     }
     lucide.createIcons();
-    drawScale(); // Render ulang visual timbangan
+    drawScale(); 
   }
 
   // ---- Logic Soal Baru ----
@@ -327,11 +336,9 @@
     currentWeight = generateWeight();
     setNeedle(currentWeight);
 
-    // Hitung Satuan yang ditanya
     askUnit = isTrapMode ? (currentUnit === 'kg' ? 'g' : 'kg') : currentUnit;
     const displayAskUnit = askUnit === 'kg' ? 'kg' : 'Gram';
 
-    // Update Label Input dan Instruksi
     const instructionEl = document.getElementById('el-instruction');
     const inputLabelEl = document.getElementById('input-label');
     
@@ -379,7 +386,6 @@
     total++;
     const d = scaleData[currentUnit][difficulty];
     
-    // Kalkulasi Konversi jika Mode Jebakan menyala
     let expectedVal = currentWeight;
     let expectedTolerance = d.tolerance;
 
@@ -393,15 +399,18 @@
       }
     }
 
-    // Pengecekan (ditambah 0.0001 untuk menghindari isu presisi desimal Javascript)
     const correct = Math.abs(val - expectedVal) <= (expectedTolerance + 0.0001);
     const displayAskUnit = askUnit === 'kg' ? 'kg' : 'g';
+    const fireStyle = getFireStyle();
 
     if (correct) {
       score++;
       streak++;
       if (streak > maxStreak) maxStreak = streak;
-      fb.innerHTML = `🎉 Benar! Jawabannya <strong>${expectedVal} ${displayAskUnit}</strong>` + (streak >= 3 ? `<br>🔥 ${streak}x berturut-turut!` : '');
+      
+      const fireEmojiStr = `<span style="display:inline-block; filter:${fireStyle.filter};">🔥</span>`;
+      fb.innerHTML = `🎉 Benar! Jawabannya <strong>${expectedVal} ${displayAskUnit}</strong>` + 
+                     (streak >= 3 ? `<br>${fireEmojiStr} ${streak}x berturut-turut!` : '');
       fb.style.background = 'rgba(34,197,94,0.15)';
       fb.style.color = '#4ade80';
       spawnConfetti();
@@ -455,6 +464,10 @@
         btn.style.borderColor = '#1e3a5f';
       }
     });
+    
+    // Perbarui warna api di streak yang sudah ada jika pengguna mengubah tingkat kesulitan di tengah jalan
+    updateStreak();
+    
     drawScale();
     newQuestion();
   }
@@ -465,18 +478,24 @@
     container.innerHTML = '';
     const show = Math.min(streak, 10);
     const frag = document.createDocumentFragment();
+    
+    const fireStyle = getFireStyle();
+
     for (let i = 0; i < show; i++) {
       const span = document.createElement('span');
       span.textContent = '🔥';
       span.style.fontSize = '18px';
       span.className = 'bounce-in';
+      span.style.display = 'inline-block'; // Diperlukan agar filter CSS berfungsi baik
+      span.style.filter = fireStyle.filter;
       span.style.animationDelay = `${i * 60}ms`;
       frag.appendChild(span);
     }
+    
     if (streak > 10) {
       const span = document.createElement('span');
       span.textContent = `+${streak - 10}`;
-      span.style.cssText = 'font-size:14px;font-weight:800;color:#fbbf24;margin-left:4px;';
+      span.style.cssText = `font-size:14px;font-weight:800;color:${fireStyle.textColor};margin-left:4px;`;
       frag.appendChild(span);
     }
     container.appendChild(frag);
