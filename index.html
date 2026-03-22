@@ -54,15 +54,17 @@
       -webkit-appearance: none; margin: 0;
     }
     input[type="number"] { -moz-appearance: textfield; }
+    
+    .toggle-active { background: #dc2626 !important; color: white !important; border-color: #dc2626 !important; }
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
 </head>
 <body class="h-full overflow-hidden">
   <div id="app-wrapper" class="h-full w-full flex flex-col items-center overflow-y-auto" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
     
-    <div class="w-full max-w-2xl px-4 pt-6 pb-2 shrink-0">
+    <div class="w-full max-w-2xl px-4 pt-5 pb-1 shrink-0">
       <h1 id="el-title" class="text-center font-black text-2xl tracking-tight leading-tight" style="color: #f8fafc;">Latihan Membaca Timbangan</h1>
-      <p id="el-instruction" class="text-center mt-1 font-semibold text-sm" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
+      <p id="el-instruction" class="text-center mt-1 font-semibold text-sm transition-colors duration-300" style="color: #94a3b8;">Berapa berat yang ditunjukkan jarum?</p>
     </div>
 
     <div class="w-full max-w-2xl px-4 flex flex-col gap-2 mt-2 shrink-0">
@@ -78,15 +80,27 @@
         </div>
       </div>
 
-      <div class="flex gap-1 justify-end">
-        <button id="btn-easy" onclick="setDifficulty('easy')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Mudah</button> 
-        <button id="btn-medium" onclick="setDifficulty('medium')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#ea580c;color:#fff;border:1px solid #ea580c;">Sedang</button> 
-        <button id="btn-hard" onclick="setDifficulty('hard')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Sulit</button>
+      <div class="flex gap-1 justify-between items-center w-full">
+        <span class="text-xs font-bold text-[#64748b]">Level:</span>
+        <div class="flex gap-1">
+          <button id="btn-easy" onclick="setDifficulty('easy')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Mudah</button> 
+          <button id="btn-medium" onclick="setDifficulty('medium')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#ea580c;color:#fff;border:1px solid #ea580c;">Sedang</button> 
+          <button id="btn-hard" onclick="setDifficulty('hard')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all duration-200" style="background:#0f3460;color:#94a3b8;border:1px solid #1e3a5f;">Sulit</button>
+        </div>
+      </div>
+
+      <div class="flex gap-2 justify-center mt-1">
+        <button id="btn-trap" onclick="toggleTrapMode()" class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#16213e;color:#94a3b8;border:1px dashed #334155;">
+          <i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan Satuan
+        </button>
+        <button id="btn-blind" onclick="toggleBlindMode()" class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300" style="background:#16213e;color:#94a3b8;border:1px dashed #334155;">
+          <i data-lucide="eye-off" style="width:14px;height:14px;"></i> Skala Buta
+        </button>
       </div>
     </div>
 
-    <div class="w-full max-w-2xl px-4 flex-1 flex flex-col items-center justify-center min-h-[220px]">
-      <div class="relative w-full max-w-[320px] sm:max-w-[380px]">
+    <div class="w-full max-w-2xl px-4 flex-1 flex flex-col items-center justify-center min-h-[200px]">
+      <div class="relative w-full max-w-[300px] sm:max-w-[360px] mt-2">
         <svg id="scale-svg" viewBox="0 0 400 280" class="w-full h-auto drop-shadow-2xl">
           <defs>
             <radialGradient id="faceGrad" cx="50%" cy="40%" r="55%">
@@ -140,30 +154,34 @@
       </div>
     </div>
 
-    <div class="w-full max-w-sm px-4 pb-4 shrink-0">
-      <div class="flex flex-col gap-3">
+    <div class="w-full max-w-sm px-4 pb-2 shrink-0">
+      <div class="flex flex-col gap-2">
         <div>
-          <label id="input-label" for="answer-input" class="block text-sm font-bold mb-1.5" style="color:#94a3b8;">Jawaban (kg)</label> 
-          <input id="answer-input" type="number" step="any" min="0" inputmode="decimal" placeholder="contoh: 2.5" class="w-full px-4 py-3.5 sm:py-4 rounded-xl text-xl sm:text-2xl font-bold text-center outline-none transition-all duration-200" style="background:#16213e;color:#f8fafc;border:2px solid #1e3a5f;font-family:'JetBrains Mono',monospace;" onfocus="this.style.borderColor='#ea580c'" onblur="this.style.borderColor='#1e3a5f'" onkeydown="if(event.key==='Enter')checkAnswer()">
+          <label id="input-label" for="answer-input" class="block text-sm font-bold mb-1 transition-colors duration-300" style="color:#94a3b8;">Jawaban (kg)</label> 
+          <input id="answer-input" type="number" step="any" min="0" inputmode="decimal" placeholder="ketik angka..." class="w-full px-4 py-3 sm:py-4 rounded-xl text-xl sm:text-2xl font-bold text-center outline-none transition-all duration-200" style="background:#16213e;color:#f8fafc;border:2px solid #1e3a5f;font-family:'JetBrains Mono',monospace;" onfocus="this.style.borderColor='#ea580c'" onblur="this.style.borderColor='#1e3a5f'" onkeydown="if(event.key==='Enter')checkAnswer()">
         </div>
         
         <button id="btn-check" onclick="checkAnswer()" class="w-full px-5 py-3.5 sm:py-4 rounded-xl font-bold text-base transition-all duration-200 pulse-glow" style="background:#ea580c;color:#fff;border:none;cursor:pointer;"> Periksa Jawaban </button>
       </div>
 
-      <div id="feedback" class="mt-3 text-center font-bold text-sm sm:text-base rounded-xl px-4 py-3 transition-all duration-300 empty:hidden" style="min-height: 48px;"></div>
+      <div id="feedback" class="mt-2 text-center font-bold text-sm sm:text-base rounded-xl px-4 py-3 transition-all duration-300 empty:hidden" style="min-height: 48px;"></div>
       
       <button id="btn-next" onclick="newQuestion()" class="w-full mt-2 mb-2 px-5 py-3.5 sm:py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-lg" style="background:#1e3a5f;color:#e2e8f0;border:2px solid #2d4a6f;cursor:pointer;display:none;" onmouseover="this.style.background='#2d4a6f'" onmouseout="this.style.background='#1e3a5f'"> Lanjut Soal Baru </button>
     </div>
 
-    <div id="streak-bar" class="w-full max-w-2xl px-4 pb-6 min-h-[40px]">
+    <div id="streak-bar" class="w-full max-w-2xl px-4 pb-4 min-h-[40px]">
       <div class="flex items-center justify-center gap-1 flex-wrap" id="streak-icons"></div>
     </div>
   </div>
 
   <script>
-  // ---- Konfigurasi Data Varian & Satuan ----
-  let currentUnit = 'kg'; // default
+  // ---- State Varian & Tantangan ----
+  let currentUnit = 'kg'; // Unit di visual timbangan
+  let askUnit = 'kg';     // Unit yang diminta di jawaban
   let difficulty = 'medium'; 
+  
+  let isTrapMode = false;
+  let isBlindMode = false;
   
   const scaleData = {
     kg: {
@@ -178,27 +196,13 @@
     }
   };
 
-  // ---- State ----
+  // ---- State Game ----
   let currentWeight = 0;
   let score = 0;
   let total = 0;
   let streak = 0;
   let maxStreak = 0;
   let answered = false;
-
-  const defaultConfig = {
-    app_title: 'Latihan Membaca Timbangan',
-    instruction_text: 'Berapa berat yang ditunjukkan jarum?',
-    btn_check: 'Periksa Jawaban',
-    btn_next: 'Lanjut Soal Baru',
-    background_color: '#1a1a2e',
-    surface_color: '#16213e',
-    text_color: '#f8fafc',
-    primary_action: '#ea580c',
-    secondary_action: '#94a3b8',
-    font_family: 'Nunito',
-    font_size: 16
-  };
 
   // ---- Menggambar Garis Timbangan ----
   function drawScale() {
@@ -229,7 +233,6 @@
       const angle = startAngle + (value / d.max) * totalAngle;
       const rad = (angle * Math.PI) / 180;
 
-      // Menghindari error pembulatan javascript saat modula
       const isMajor = Math.abs(value % majorStep) < 0.001 || Math.abs(value % majorStep - majorStep) < 0.001;
       const isHalfMajor = !isMajor && (Math.abs(value % halfMajorStep) < 0.001);
 
@@ -246,15 +249,16 @@
       line.setAttribute('stroke-width', sw);
       markingsFrag.appendChild(line);
 
-      // Gambar Angka hanya di garis Mayor
-      if (isMajor) {
+      // Skala Buta: Sembunyikan angka, KECUALI angka 0 dan angka Maksimal
+      const showNumber = !isBlindMode || (Math.round(value) === 0 || Math.round(value) === d.max);
+
+      if (isMajor && showNumber) {
         const labelR = r - 26;
         const text = document.createElementNS(SVG_NS, 'text');
         text.setAttribute('x', cx + labelR * Math.cos(rad));
         text.setAttribute('y', cy + labelR * Math.sin(rad));
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'central');
-        // Perkecil ukuran font jika angka ribuan (Gram)
         text.setAttribute('font-size', currentUnit === 'g' && d.max > 1000 ? '10' : '12');
         text.setAttribute('font-weight', '700');
         text.setAttribute('fill', '#334155');
@@ -267,15 +271,10 @@
     numbersEl.appendChild(numbersFrag);
 
     document.getElementById('range-badge').textContent = d.range;
-    document.getElementById('diff-label').textContent = d.label;
-    
-    // Update label text SVG
+    document.getElementById('diff-label').textContent = isBlindMode ? 'Mode Buta' : d.label;
     document.getElementById('unit-label').textContent = currentUnit === 'kg' ? 'kg' : 'g';
-    // Update label input form
-    document.getElementById('input-label').textContent = `Jawaban (${currentUnit === 'kg' ? 'kg' : 'Gram'})`;
   }
 
-  // ---- Jarum ----
   function setNeedle(weight) {
     const d = scaleData[currentUnit][difficulty];
     const startAngle = -135;
@@ -286,20 +285,65 @@
     needle.style.transformOrigin = '200px 160px';
   }
 
-  // ---- Logic Soal Baru ----
   function generateWeight() {
     const d = scaleData[currentUnit][difficulty];
     const steps = d.max / d.step;
-    const minStep = 1;
-    const randomStep = Math.floor(Math.random() * (steps - minStep + 1)) + minStep;
-    // Bersihkan angka desimal
+    const randomStep = Math.floor(Math.random() * steps) + 1;
     return parseFloat((randomStep * d.step).toFixed(2));
   }
 
+  // ---- Mode Tantangan Toggles ----
+  function toggleTrapMode() {
+    isTrapMode = !isTrapMode;
+    const btn = document.getElementById('btn-trap');
+    if (isTrapMode) {
+      btn.classList.add('toggle-active');
+      btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: ON`;
+    } else {
+      btn.classList.remove('toggle-active');
+      btn.innerHTML = `<i data-lucide="shuffle" style="width:14px;height:14px;"></i> Jebakan: OFF`;
+    }
+    lucide.createIcons();
+    newQuestion(); // Render ulang soal
+  }
+
+  function toggleBlindMode() {
+    isBlindMode = !isBlindMode;
+    const btn = document.getElementById('btn-blind');
+    if (isBlindMode) {
+      btn.classList.add('toggle-active');
+      btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: ON`;
+    } else {
+      btn.classList.remove('toggle-active');
+      btn.innerHTML = `<i data-lucide="eye-off" style="width:14px;height:14px;"></i> Buta: OFF`;
+    }
+    lucide.createIcons();
+    drawScale(); // Render ulang visual timbangan
+  }
+
+  // ---- Logic Soal Baru ----
   function newQuestion() {
     answered = false;
     currentWeight = generateWeight();
     setNeedle(currentWeight);
+
+    // Hitung Satuan yang ditanya
+    askUnit = isTrapMode ? (currentUnit === 'kg' ? 'g' : 'kg') : currentUnit;
+    const displayAskUnit = askUnit === 'kg' ? 'kg' : 'Gram';
+
+    // Update Label Input dan Instruksi
+    const instructionEl = document.getElementById('el-instruction');
+    const inputLabelEl = document.getElementById('input-label');
+    
+    if (isTrapMode) {
+      instructionEl.innerHTML = `Berapa beratnya? <span style="color:#ef4444;font-weight:900;">JAWAB DALAM ${displayAskUnit.toUpperCase()}!</span>`;
+      inputLabelEl.textContent = `Jawaban dalam (${displayAskUnit})`;
+      inputLabelEl.style.color = '#ef4444';
+    } else {
+      instructionEl.innerHTML = `Berapa berat yang ditunjukkan jarum?`;
+      inputLabelEl.textContent = `Jawaban (${displayAskUnit})`;
+      inputLabelEl.style.color = '#94a3b8';
+    }
 
     const input = document.getElementById('answer-input');
     input.value = '';
@@ -334,21 +378,36 @@
     answered = true;
     total++;
     const d = scaleData[currentUnit][difficulty];
-    const diff = Math.abs(val - currentWeight);
-    const correct = diff <= d.tolerance;
-    const unitText = currentUnit === 'kg' ? 'kg' : 'g';
+    
+    // Kalkulasi Konversi jika Mode Jebakan menyala
+    let expectedVal = currentWeight;
+    let expectedTolerance = d.tolerance;
+
+    if (isTrapMode) {
+      if (currentUnit === 'kg' && askUnit === 'g') {
+        expectedVal = currentWeight * 1000;
+        expectedTolerance = d.tolerance * 1000;
+      } else if (currentUnit === 'g' && askUnit === 'kg') {
+        expectedVal = currentWeight / 1000;
+        expectedTolerance = d.tolerance / 1000;
+      }
+    }
+
+    // Pengecekan (ditambah 0.0001 untuk menghindari isu presisi desimal Javascript)
+    const correct = Math.abs(val - expectedVal) <= (expectedTolerance + 0.0001);
+    const displayAskUnit = askUnit === 'kg' ? 'kg' : 'g';
 
     if (correct) {
       score++;
       streak++;
       if (streak > maxStreak) maxStreak = streak;
-      fb.innerHTML = `🎉 Benar! Jawabannya <strong>${currentWeight} ${unitText}</strong>` + (streak >= 3 ? `<br>🔥 ${streak}x berturut-turut!` : '');
+      fb.innerHTML = `🎉 Benar! Jawabannya <strong>${expectedVal} ${displayAskUnit}</strong>` + (streak >= 3 ? `<br>🔥 ${streak}x berturut-turut!` : '');
       fb.style.background = 'rgba(34,197,94,0.15)';
       fb.style.color = '#4ade80';
       spawnConfetti();
     } else {
       streak = 0;
-      fb.innerHTML = `❌ Kurang tepat. Jawabanmu <strong>${val} ${unitText}</strong>,<br>yang benar <strong>${currentWeight} ${unitText}</strong>`;
+      fb.innerHTML = `❌ Kurang tepat. Jawabanmu <strong>${val} ${displayAskUnit}</strong>,<br>yang benar <strong>${expectedVal} ${displayAskUnit}</strong>`;
       fb.style.background = 'rgba(239,68,68,0.15)';
       fb.style.color = '#f87171';
       input.classList.add('shake');
@@ -362,24 +421,19 @@
     updateStreak();
   }
 
-  // ---- Pengaturan Satuan & Tingkat Kesulitan ----
+  // ---- Pengaturan Dasar ----
   function setUnit(u) {
     currentUnit = u;
     const btnKg = document.getElementById('btn-unit-kg');
     const btnG = document.getElementById('btn-unit-g');
     
-    const cfg = window.elementSdk ? window.elementSdk.config : defaultConfig;
-    const primary = cfg.primary_action || defaultConfig.primary_action;
-
     if (u === 'kg') {
-      btnKg.style.background = primary; btnKg.style.color = '#fff';
+      btnKg.style.background = '#ea580c'; btnKg.style.color = '#fff';
       btnG.style.background = 'transparent'; btnG.style.color = '#94a3b8';
     } else {
-      btnG.style.background = primary; btnG.style.color = '#fff';
+      btnG.style.background = '#ea580c'; btnG.style.color = '#fff';
       btnKg.style.background = 'transparent'; btnKg.style.color = '#94a3b8';
     }
-    
-    // Refresh SVG & Buat Soal Baru
     drawScale();
     newQuestion();
   }
@@ -387,21 +441,17 @@
   function setDifficulty(d) {
     difficulty = d;
     const btns = { easy: 'btn-easy', medium: 'btn-medium', hard: 'btn-hard' };
-    const cfg = window.elementSdk ? window.elementSdk.config : defaultConfig;
-    const primaryAction = cfg.primary_action || defaultConfig.primary_action;
-    const surfaceColor = cfg.surface_color || defaultConfig.surface_color;
-    const secondaryAction = cfg.secondary_action || defaultConfig.secondary_action;
-
+    
     Object.entries(btns).forEach(([key, id]) => {
       const btn = document.getElementById(id);
       if(!btn) return;
       if (key === d) {
-        btn.style.background = primaryAction;
+        btn.style.background = '#ea580c';
         btn.style.color = '#fff';
-        btn.style.borderColor = primaryAction;
+        btn.style.borderColor = '#ea580c';
       } else {
-        btn.style.background = surfaceColor;
-        btn.style.color = secondaryAction;
+        btn.style.background = '#0f3460';
+        btn.style.color = '#94a3b8';
         btn.style.borderColor = '#1e3a5f';
       }
     });
@@ -415,7 +465,6 @@
     container.innerHTML = '';
     const show = Math.min(streak, 10);
     const frag = document.createDocumentFragment();
-
     for (let i = 0; i < show; i++) {
       const span = document.createElement('span');
       span.textContent = '🔥';
@@ -424,7 +473,6 @@
       span.style.animationDelay = `${i * 60}ms`;
       frag.appendChild(span);
     }
-    
     if (streak > 10) {
       const span = document.createElement('span');
       span.textContent = `+${streak - 10}`;
@@ -438,7 +486,6 @@
     const container = document.getElementById('confetti-container');
     const colors = ['#ea580c', '#fbbf24', '#4ade80', '#60a5fa', '#f472b6', '#a78bfa'];
     const frag = document.createDocumentFragment();
-
     for (let i = 0; i < 20; i++) {
       const piece = document.createElement('div');
       piece.className = 'confetti-piece';
@@ -451,86 +498,6 @@
       setTimeout(() => piece.remove(), 2000);
     }
     container.appendChild(frag);
-  }
-
-  function adjustColor(hex, amount) {
-    hex = hex.replace('#', '');
-    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-    let r = Math.max(0, Math.min(255, parseInt(hex.substring(0, 2), 16) + amount));
-    let g = Math.max(0, Math.min(255, parseInt(hex.substring(2, 4), 16) + amount));
-    let b = Math.max(0, Math.min(255, parseInt(hex.substring(4, 6), 16) + amount));
-    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
-  }
-
-  function applyConfig(config) {
-    const c = key => config[key] || defaultConfig[key];
-    const font = c('font_family');
-    const bg = c('background_color');
-    const surface = c('surface_color');
-    const text = c('text_color');
-    const primary = c('primary_action');
-    const secondary = c('secondary_action');
-
-    document.getElementById('el-title').textContent = c('app_title');
-    document.getElementById('el-instruction').textContent = c('instruction_text');
-    document.getElementById('btn-check').textContent = c('btn_check');
-    document.getElementById('btn-next').textContent = c('btn_next');
-
-    const fontStack = `${font}, 'Nunito', sans-serif`;
-    document.body.style.fontFamily = fontStack;
-
-    const wrapper = document.getElementById('app-wrapper');
-    wrapper.style.background = `linear-gradient(135deg, ${bg} 0%, ${surface} 50%, ${adjustColor(bg, 20)} 100%)`;
-
-    document.getElementById('el-title').style.color = text;
-    document.getElementById('el-instruction').style.color = secondary;
-    document.getElementById('el-score').style.color = '#fbbf24';
-
-    const input = document.getElementById('answer-input');
-    input.style.background = surface;
-    input.style.color = text;
-
-    document.getElementById('btn-check').style.background = primary;
-    document.getElementById('btn-next').style.borderColor = adjustColor(surface, 30);
-
-    setUnit(currentUnit);
-    setDifficulty(difficulty);
-  }
-
-  // ---- Element SDK ----
-  if(window.elementSdk) {
-    window.elementSdk.init({
-      defaultConfig,
-      onConfigChange: async (config) => { applyConfig(config); },
-      mapToCapabilities: (config) => {
-        const c = key => config[key] || defaultConfig[key];
-        const makeColor = (key) => ({
-          get: () => c(key),
-          set: (v) => { config[key] = v; window.elementSdk.setConfig({ [key]: v }); }
-        });
-        return {
-          recolorables: [
-            makeColor('background_color'), makeColor('surface_color'),
-            makeColor('text_color'), makeColor('primary_action'), makeColor('secondary_action')
-          ],
-          borderables: [],
-          fontEditable: {
-            get: () => c('font_family'),
-            set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
-          },
-          fontSizeable: {
-            get: () => c('font_size'),
-            set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
-          }
-        };
-      },
-      mapToEditPanelValues: (config) => new Map([
-        ['app_title', config.app_title || defaultConfig.app_title],
-        ['instruction_text', config.instruction_text || defaultConfig.instruction_text],
-        ['btn_check', config.btn_check || defaultConfig.btn_check],
-        ['btn_next', config.btn_next || defaultConfig.btn_next]
-      ])
-    });
   }
 
   // ---- Init ----
